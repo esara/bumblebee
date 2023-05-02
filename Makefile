@@ -63,7 +63,7 @@ PLATFORMS?=linux/amd64
 docker-build:
 #   may run into issues with apt-get and the apt.llvm.org repo, in which case use --no-cache to build
 #   e.g. `docker build --no-cache ./builder -f builder/Dockerfile -t $(HUB)/bumblebee/builder:$(VERSION)
-	$(DOCKER) build --platform $(PLATFORMS) $(PUSH_CMD) ./builder -f builder/Dockerfile -t $(HUB)/bumblebee/builder:$(VERSION)
+	$(DOCKER) build --platform $(PLATFORMS) $(PUSH_CMD) ./builder -f builder/Dockerfile -t $(HUB)/$(REPO_NAME)/builder:$(VERSION)
 
 docker-push: PUSH_CMD=--push
 docker-push: DOCKER=docker buildx
@@ -132,11 +132,11 @@ $(OUTDIR)/Dockerfile-bee: $(BEE_DIR)/Dockerfile-bee
 
 .PHONY: docker-build-bee
 docker-build-bee: build-cli $(OUTDIR)/Dockerfile-bee
-	$(DOCKER) build $(OUTDIR) -f $(OUTDIR)/Dockerfile-bee -t $(HUB)/bumblebee/bee:$(VERSION)
+	$(DOCKER) build $(OUTDIR) -f $(OUTDIR)/Dockerfile-bee -t $(HUB)/$(REPO_NAME)/bee:$(VERSION)
 
 .PHONY: docker-push-bee
 docker-push-bee: docker-build-bee
-	$(DOCKER) push $(HUB)/bumblebee/bee:$(VERSION)
+	$(DOCKER) push $(HUB)/$(REPO_NAME)/bee:$(VERSION)
 
 
 #----------------------------------------------------------------------------------
@@ -155,7 +155,6 @@ $(OUTDIR)/operator-linux-arm64: $(SOURCES)
 .PHONY: operator-linux-arm64
 operator-linux-arm64: $(OUTDIR)/operator-linux-arm64
 
-
 .PHONY: build-operator
 build-operator: operator-linux-amd64 operator-linux-arm64
 
@@ -166,11 +165,11 @@ $(OUTDIR)/Dockerfile-operator: $(OPERATOR_DIR)/Dockerfile-operator
 OPERATOR_DIR := cmd/operator
 .PHONY: docker-build-operator
 docker-build-operator: build-operator $(OUTDIR)/Dockerfile-operator
-	$(DOCKER) build $(OUTDIR) -f $(OUTDIR)/Dockerfile-operator -t $(HUB)/bumblebee/operator:$(VERSION)
+	$(DOCKER) build $(OUTDIR) -f $(OUTDIR)/Dockerfile-operator -t $(HUB)/$(REPO_NAME)/operator:$(VERSION)
 
 .PHONY: docker-push-operator
 docker-push-operator: docker-build-operator
-	$(DOCKER) push $(HUB)/bumblebee/operator:$(VERSION)
+	$(DOCKER) push $(HUB)/$(REPO_NAME)/operator:$(VERSION)
 
 ##----------------------------------------------------------------------------------
 ## Release
@@ -223,4 +222,3 @@ clean-helm-%:
 	rm -f $(HELM_ROOTDIR)/$*/chart.lock
 	rm -f $(HELM_ROOTDIR)/$*/chart.yaml
 	rm -f $(HELM_ROOTDIR)/$*/values.yaml
-
